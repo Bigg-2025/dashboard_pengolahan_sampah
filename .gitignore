@@ -1,0 +1,6 @@
+# cache python
+__pycache__/
+*.pyc
+
+# vscode setting (biar tidak ikut ke github)
+.vscode/

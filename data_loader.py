@@ -3,9 +3,7 @@ import json
 import pandas as pd
 import streamlit as st
 
-# =========================================================
-# MAPPING NAMA PROVINSI GeoJSON → DataFrame
-# =========================================================
+# MAPPING NAMA PROVINSI
 NAME_MAP = {
     'Aceh'              : 'ACEH',
     'Bali'              : 'BALI',
@@ -49,7 +47,7 @@ REV_MAP = {v: k for k, v in NAME_MAP.items()}
 @st.cache_data
 def load_data():
     candidates = [
-        "data_sampah_clean.xlsx",
+        "asset/data_sampah_clean.xlsx",
         "/mnt/user-data/uploads/data_sampah_clean.xlsx",
     ]
     for path in candidates:
@@ -57,7 +55,7 @@ def load_data():
             df = pd.read_excel(path)
             df = _clean(df)
             return df
-    st.error(" File `data_sampah_clean.xlsx` tidak ditemukan.")
+    st.error("❌ File `data_sampah_clean.xlsx` tidak ditemukan.")
     st.stop()
 
 
@@ -89,7 +87,7 @@ def _clean(df: pd.DataFrame) -> pd.DataFrame:
 @st.cache_data
 def load_geojson():
     candidates = [
-        "gadm41_IDN_1.json",
+        "asset/gadm41_IDN_1.json",
         "/mnt/user-data/uploads/gadm41_IDN_1.json",
     ]
     for path in candidates:
@@ -109,7 +107,6 @@ def apply_filters(df: pd.DataFrame, provinsi_sel, jenis_tpa_sel, timbulan_range)
 
 
 def agg_provinsi(dff: pd.DataFrame) -> pd.DataFrame:
-    """Agregasi per provinsi + tambah NAME_1 untuk merge GeoJSON."""
     timbulan = dff.groupby('Provinsi')['Timbulan'].sum().reset_index()
     persen   = (
         dff.groupby('Provinsi')[['% S. Terkelola', '% S. Belum Terkelola']]

@@ -16,12 +16,8 @@ _XGRID = dict(gridcolor='#E8F5E9')
 _YGRID = dict(gridcolor='#E8F5E9')
 
 
-# ──────────────────────────────────────────────
 # ROW 1
-# ──────────────────────────────────────────────
-
 def chart_top10_kota(dff):
-    """Bar horizontal Top 10 Kota/Kab timbulan terbesar."""
     top10 = (
         dff.groupby('Kota/Kabupaten')['Timbulan']
         .sum()
@@ -51,7 +47,6 @@ def chart_top10_kota(dff):
 
 
 def chart_jenis_tpa(dff):
-    """Donut chart distribusi Jenis TPA."""
     jenis = dff['Jenis TPA'].value_counts().reset_index()
     jenis.columns = ['Jenis TPA', 'Jumlah']
     fig = px.pie(
@@ -69,51 +64,63 @@ def chart_jenis_tpa(dff):
     )
     return fig
 
-
-# ──────────────────────────────────────────────
 # ROW 2
-# ──────────────────────────────────────────────
-
 def chart_pengelolaan_provinsi(dff):
-    """Grouped bar: % terkelola vs belum per provinsi (top 15)."""
     prov_agg = (
         dff.groupby('Provinsi')[['% S. Terkelola', '% S. Belum Terkelola']]
         .mean()
-        .round(2)
         .reset_index()
-        .sort_values('% S. Terkelola', ascending=False)
-        .head(15)
     )
-    fig = go.Figure()
-    fig.add_trace(go.Bar(
-        name='Terkelola',
-        x=prov_agg['Provinsi'], y=prov_agg['% S. Terkelola'],
-        marker_color=HIJAU_MUDA,
-        text=prov_agg['% S. Terkelola'].apply(lambda x: f'{x:.1f}%'),
-        textposition='auto',
-    ))
-    fig.add_trace(go.Bar(
-        name='Belum Terkelola',
-        x=prov_agg['Provinsi'], y=prov_agg['% S. Belum Terkelola'],
-        marker_color=MERAH,
-        opacity=0.7,
-    ))
-    fig.update_layout(
+    #  Terkelola 
+    prov_agg['Terkelola_pct'] = prov_agg['% S. Terkelola'].round(4)
+    prov_agg['Belum_pct']     = prov_agg['% S. Belum Terkelola'].round(2)
+
+    # Bar % Terkelola
+    top_t = prov_agg.sort_values('Terkelola_pct', ascending=False).head(15)
+    fig_t = px.bar(
+        top_t, x='Provinsi', y='Terkelola_pct',
+        labels={'Terkelola_pct': '% Terkelola', 'Provinsi': ''},
+        text=top_t['Terkelola_pct'].apply(lambda x: f'{x:.4f}'),
+    )
+    fig_t.update_traces(textposition='outside', marker_color=HIJAU_MUDA)
+    fig_t.update_layout(
         **_LAYOUT_BASE,
-        barmode='group',
-        margin=dict(l=10, r=10, t=10, b=80),
+        title=dict(text='<b>% Sampah Terkelola per Provinsi</b>',
+                   font=dict(size=13, color=HIJAU_TUA)),
+        margin=dict(l=10, r=10, t=40, b=80),
         height=370,
-        legend=dict(orientation='h', yanchor='bottom', y=1.01, xanchor='right', x=1),
         xaxis_tickangle=-35,
-        yaxis_title='Persentase (%)',
+        yaxis_title='% Terkelola',
+        showlegend=False,
     )
-    fig.update_xaxes(**_XGRID)
-    fig.update_yaxes(**_YGRID)
-    return fig
+    fig_t.update_xaxes(**_XGRID)
+    fig_t.update_yaxes(**_YGRID)
+
+    # Bar % Belum Terkelola
+    top_b = prov_agg.sort_values('Belum_pct', ascending=False).head(15)
+    fig_b = px.bar(
+        top_b, x='Provinsi', y='Belum_pct',
+        labels={'Belum_pct': '% Belum Terkelola', 'Provinsi': ''},
+        text=top_b['Belum_pct'].apply(lambda x: f'{x:.2f}%'),
+    )
+    fig_b.update_traces(textposition='outside', marker_color=MERAH)
+    fig_b.update_layout(
+        **_LAYOUT_BASE,
+        title=dict(text='<b>% Sampah Belum Terkelola per Provinsi</b>',
+                   font=dict(size=13, color=HIJAU_TUA)),
+        margin=dict(l=10, r=10, t=40, b=80),
+        height=370,
+        xaxis_tickangle=-35,
+        yaxis_title='% Belum Terkelola',
+        showlegend=False,
+    )
+    fig_b.update_xaxes(**_XGRID)
+    fig_b.update_yaxes(**_YGRID)
+
+    return fig_t, fig_b
 
 
 def chart_scatter(dff):
-    """Scatter: Timbulan vs % Belum Terkelola."""
     fig = px.scatter(
         dff, x='Timbulan', y='% S. Belum Terkelola',
         color='Provinsi',
@@ -132,13 +139,8 @@ def chart_scatter(dff):
     fig.update_yaxes(**_YGRID)
     return fig
 
-
-# ──────────────────────────────────────────────
 # ROW 3
-# ──────────────────────────────────────────────
-
 def chart_timbulan_provinsi(dff):
-    """Bar vertikal total timbulan per provinsi (top 15)."""
     prov = (
         dff.groupby('Provinsi')['Timbulan']
         .sum()
@@ -167,7 +169,6 @@ def chart_timbulan_provinsi(dff):
 
 
 def chart_boxplot_tpa(dff):
-    """Box plot distribusi timbulan per jenis TPA."""
     fig = px.box(
         dff, x='Jenis TPA', y='Timbulan',
         color='Jenis TPA',
@@ -186,13 +187,8 @@ def chart_boxplot_tpa(dff):
     fig.update_yaxes(**_YGRID)
     return fig
 
-
-# ──────────────────────────────────────────────
 # ROW 4
-# ──────────────────────────────────────────────
-
 def chart_gauge(dff):
-    """Gauge chart rata-rata nasional % terkelola."""
     val = dff['% S. Terkelola'].mean()
     fig = go.Figure(go.Indicator(
         mode="gauge+number+delta",
@@ -228,7 +224,6 @@ def chart_gauge(dff):
 
 
 def chart_heatmap(dff):
-    """Heatmap % terkelola per provinsi & jenis TPA (top 10 provinsi)."""
     top_prov = dff.groupby('Provinsi')['Timbulan'].sum().nlargest(10).index
     pivot = (
         dff[dff['Provinsi'].isin(top_prov)]
@@ -253,16 +248,8 @@ def chart_heatmap(dff):
     )
     return fig
 
-
-# ──────────────────────────────────────────────
 # PETA CHOROPLETH
-# ──────────────────────────────────────────────
-
 def _choropleth_base(df_map, geojson, value_col, title, color_scale):
-    """
-    Selalu gunakan range data aktual (min–max) agar 3 warna
-    merah–kuning–hijau terlihat jelas meski rentang nilai sempit.
-    """
     vmin = df_map[value_col].min()
     vmax = df_map[value_col].max()
     # Midpoint persis di tengah rentang data
@@ -300,12 +287,12 @@ def _choropleth_base(df_map, geojson, value_col, title, color_scale):
     return fig
 
 
-# Skala 3 warna konsisten: merah (rendah) → kuning (tengah) → hijau (tinggi)
+# Skala 
 _SCALE_RYG = [[0, MERAH], [0.5, KUNING], [1, HIJAU_MED]]
 # Untuk "belum terkelola": hijau (rendah/bagus) → kuning → merah (tinggi/buruk)
 _SCALE_GYR = [[0, HIJAU_MED], [0.5, KUNING], [1, MERAH]]
 # Untuk timbulan: hijau muda → kuning → hijau tua (gradasi kepadatan)
-_SCALE_TIM = [[0, HIJAU_PALE], [0.5, KUNING], [1, HIJAU_TUA]]
+_SCALE_TIM = [[0, HIJAU_MED], [0.5, KUNING], [1, MERAH]]
 
 
 def chart_map_timbulan(df_map, geojson):
@@ -318,7 +305,6 @@ def chart_map_timbulan(df_map, geojson):
 
 
 def chart_map_terkelola(df_map, geojson):
-    # Rendah = merah (buruk), tinggi = hijau (baik)
     return _choropleth_base(
         df_map, geojson,
         value_col='% S. Terkelola',
@@ -328,7 +314,7 @@ def chart_map_terkelola(df_map, geojson):
 
 
 def chart_map_belum(df_map, geojson):
-    # Rendah = hijau (bagus), tinggi = merah (buruk)
+
     return _choropleth_base(
         df_map, geojson,
         value_col='% S. Belum Terkelola',

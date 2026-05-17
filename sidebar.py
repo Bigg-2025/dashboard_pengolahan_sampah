@@ -1,12 +1,6 @@
 import streamlit as st
 import pandas as pd
-
-
 def render_sidebar(df: pd.DataFrame):
-    """
-    Render sidebar filter dan kembalikan tuple:
-    (provinsi_sel, jenis_tpa_sel, timbulan_range)
-    """
     with st.sidebar:
         st.markdown("## ♻️ Filter Data")
         st.markdown("---")

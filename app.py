@@ -9,7 +9,7 @@ st.set_page_config(
 )
 
 # modul lokal 
-from theme       import CSS, VIEWPORT_FIX
+from theme       import CSS
 from data_loader import load_data, load_geojson, apply_filters, agg_provinsi
 from sidebar     import render_sidebar
 from kpi         import render_kpi
@@ -22,8 +22,6 @@ from charts      import (
 
 #  inject CSS 
 st.markdown(CSS, unsafe_allow_html=True)
-# inject viewport meta tag (kunci responsivitas mobile)
-st.markdown(VIEWPORT_FIX, unsafe_allow_html=True)
 
 # load data 
 df      = load_data()

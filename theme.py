@@ -11,21 +11,8 @@ MERAH_PALE  = "#FFCDD2"
 KUNING_PALE = "#FFF9C4"
 ABU         = "#ECEFF1"
 
+# Palette urutan untuk bar/pie
 HIJAU_PALET = [HIJAU_TUA, HIJAU_MED, HIJAU_MUDA, HIJAU_CERAH, HIJAU_PALE, "#A5D6A7", "#69F0AE"]
-
-VIEWPORT_FIX = """
-<script>
-(function() {
-    // Tambah meta viewport jika belum ada — kunci agar media query aktif di mobile
-    if (!document.querySelector('meta[name="viewport"]')) {
-        var meta = document.createElement('meta');
-        meta.name = 'viewport';
-        meta.content = 'width=device-width, initial-scale=1.0, maximum-scale=1.0';
-        document.head.appendChild(meta);
-    }
-})();
-</script>
-"""
 
 CSS = f"""
 <style>
@@ -117,42 +104,30 @@ CSS = f"""
         color: {HIJAU_TUA};
     }}
 
-    /* ══════════════════════════════════════════
-       FIX #2: Paksa semua konten tidak overflow
-       Ini jaring pengaman sebelum media query aktif
-    ══════════════════════════════════════════ */
-    .main .block-container {{
-        max-width: 100% !important;
-        overflow-x: hidden !important;
-    }}
-    .stApp {{
-        overflow-x: hidden !important;
-    }}
-
     /* ── MOBILE ≤ 768px ── */
-    @media screen and (max-width: 768px) {{
+    @media (max-width: 768px) {{
+        /* Sidebar collapse otomatis di mobile — tidak perlu override */
+
         .dashboard-header {{
-            padding: 1rem;
+            padding: 1rem 1rem;
             border-radius: 10px;
         }}
 
         /* KPI: 2 kolom di mobile */
         .kpi-grid {{
-            grid-template-columns: repeat(2, 1fr) !important;
+            grid-template-columns: repeat(2, 1fr);
         }}
 
-        /* FIX #3: Selector Plotly yang benar di Streamlit terbaru */
-        [data-testid="stPlotlyChart"] > div {{
+        /* Plotly chart: pastikan tidak overflow */
+        .stPlotlyChart {{
             overflow-x: auto !important;
         }}
-        [data-testid="stPlotlyChart"] iframe,
-        [data-testid="stPlotlyChart"] .js-plotly-plot {{
+        iframe {{
             max-width: 100% !important;
-            min-height: 280px !important;
         }}
 
         /* Padding konten lebih sempit */
-        .main .block-container {{
+        .block-container {{
             padding-left: 0.75rem !important;
             padding-right: 0.75rem !important;
             padding-top: 1rem !important;
@@ -160,53 +135,26 @@ CSS = f"""
 
         /* Section title lebih kecil */
         .section-title {{
-            font-size: 0.9rem !important;
+            font-size: 0.95rem;
         }}
 
-        /* FIX #4: Tab label — selector yang benar */
-        [data-testid="stTabs"] [role="tab"] {{
-            font-size: 0.72rem !important;
-            padding: 0.35rem 0.5rem !important;
-            white-space: nowrap;
-        }}
-        /* Tab container bisa di-scroll horizontal jika terlalu banyak */
-        [data-testid="stTabs"] [role="tablist"] {{
-            overflow-x: auto !important;
-            flex-wrap: nowrap !important;
-        }}
-
-        /* Sidebar: pastikan tertutup dan tidak menekan konten */
-        [data-testid="stSidebar"] {{
-            transform: translateX(-100%);
-        }}
-        [data-testid="collapsedControl"] {{
-            display: flex !important;
+        /* Tab label tidak terpotong */
+        [data-testid="stTabs"] button {{
+            font-size: 0.75rem !important;
+            padding: 0.4rem 0.5rem !important;
         }}
     }}
 
     /* ── SMALL MOBILE ≤ 480px ── */
-    @media screen and (max-width: 480px) {{
+    @media (max-width: 480px) {{
         .kpi-grid {{
-            grid-template-columns: 1fr 1fr !important;
-        }}
-        .metric-card {{
-            padding: 0.65rem !important;
+            grid-template-columns: 1fr 1fr;
         }}
         .metric-card .value {{
-            font-size: 1.2rem !important;
-        }}
-        .metric-card .label {{
-            font-size: 0.6rem !important;
+            font-size: 1.3rem;
         }}
         .dashboard-header h1 {{
-            font-size: 1rem !important;
-        }}
-        .dashboard-header p {{
-            font-size: 0.75rem !important;
-        }}
-        /* Plotly chart height lebih kecil di HP kecil */
-        [data-testid="stPlotlyChart"] iframe {{
-            min-height: 240px !important;
+            font-size: 1.1rem;
         }}
     }}
 </style>

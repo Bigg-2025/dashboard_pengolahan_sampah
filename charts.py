@@ -281,10 +281,6 @@ def _choropleth_base(df_map, geojson, value_col, title, color_scale):
             tickfont=dict(color=HIJAU_TUA),
             tickvals=[vmin, vmid, vmax],
             ticktext=[f"{vmin:.2f}", f"{vmid:.2f}", f"{vmax:.2f}"],
-            # FIX mobile: perkecil agar tidak mendominasi layar sempit
-            thickness=12,  # default 30 → lebih ramping
-            len=0.6,       # 60% tinggi chart, bukan full height
-            x=1.01,        # tetap di sisi kanan
         ),
         font_color=HIJAU_TUA,
     )

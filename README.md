@@ -20,7 +20,7 @@ dashboard_app/
 
 ---
 
-## 📦 File Data yang Dibutuhkan
+##  File Data yang Dibutuhkan
 
 Letakkan kedua file berikut **di folder yang sama** dengan `app.py`:
 
